@@ -39,6 +39,10 @@ class StorageService {
 
   removeTask(uuid) {
     // TODO:
+    let taskList = this.populateTasks();
+    //NOT SURE ABOUT THE FOLLOWING LINE
+    taskList = taskList.filter(task => task.id != uuid);
+    localStorage.setItem('taskList', JSON.stringify(taskList));
   }
 }
 
@@ -96,34 +100,59 @@ class UserInterface {
       <td>${task.name}</td>
       <td>${this.getCompleteIconHtml(task.completed)}</td>
       <td>${this.formatDate(task.dateCompleted)}</td>
-      <td>TODO: Complete this</td>
+      <td>Remove</td>
     `;
 
     // TODO: add id attribute to row
-
+    row.setAttribute('id', task.id);
     this.table.append(row);
     this.addCompleteTaskListenerToRow(row);
-    this.addDeleteListenerToRow(row);
+    this.addDeleteListenerToRow(row, task);
   }
 
   getCompleteIconHtml(completed) {
-    return '<div>TODO</div>'
+    return `<div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+              <label class="form-check-label" for="flexCheckDefault">
+                  Not Completed
+              </label>
+            </div>`
   }
 
   formatDate(date) {
-    // TODO
+    if (date) {
+      return date;
+    } else {
+      return new Date();
+    }
   }
 
   addCompleteTaskListenerToRow(row) {
     // TODO
+    row.children[1].addEventListener('click', (e) =>{
+      row.children[1].innerHTML = 
+        `<td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+              <label class="form-check-label" for="flexCheckChecked">
+                    Completed
+              </label>
+            </div>`
+      
+    });
   }
 
-  addDeleteListenerToRow(row) {
+  addDeleteListenerToRow(row, task) {
     // TODO
+    row.children[3].addEventListener('click', (e) => {
+      const uuid = e.target.getAttribute(task.id);
+      this.storage.removeTask(uuid);
+      this.populateTasksTable();
+    });
   }
 
   clearFormInputs() {
-    // TODO
+    this.taskInput.value = '';
   }
 }
 
